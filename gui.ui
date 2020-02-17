@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>661</width>
+    <height>430</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>转台控制程序</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>20</y>
+     <width>221</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>串口控制</string>
+   </property>
+   <widget class="QPushButton" name="pushButton_closeport">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>40</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>关闭</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_openport">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>10</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>打开</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>串口号</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit_portnum">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>COM5</string>
+       </property>
+       <property name="maxLength">
+        <number>5</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>401</width>
+     <height>211</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>偏振盒状态</string>
+   </property>
+   <widget class="QTableWidget" name="tableWidget_stat">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>381</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
+    </property>
+    <property name="midLineWidth">
+     <number>1</number>
+    </property>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>86</number>
+    </attribute>
+    <row>
+     <property name="text">
+      <string>轴1</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>轴2</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>轴3</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>轴4</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>盒体</string>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>当前位置</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>开闭环</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>运动状态</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>报警情况</string>
+     </property>
+    </column>
+    <item row="0" column="0">
+     <property name="text">
+      <string>-12.3456</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="0" column="1">
+     <property name="text">
+      <string>开环</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="0" column="2">
+     <property name="text">
+      <string>静止</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="0" column="3">
+     <property name="text">
+      <string>正常</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="1" column="0">
+     <property name="text">
+      <string>-12.3456</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="1" column="1">
+     <property name="text">
+      <string>闭环</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="1" column="2">
+     <property name="text">
+      <string>静止</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="1" column="3">
+     <property name="text">
+      <string>正常</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="2" column="0">
+     <property name="text">
+      <string>-12.3456</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="2" column="1">
+     <property name="text">
+      <string>闭环</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="2" column="2">
+     <property name="text">
+      <string>静止</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="2" column="3">
+     <property name="text">
+      <string>正常</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="3" column="0">
+     <property name="text">
+      <string>-12.3456</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="3" column="1">
+     <property name="text">
+      <string>闭环</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="3" column="2">
+     <property name="text">
+      <string>静止</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="3" column="3">
+     <property name="text">
+      <string>正常</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="4" column="0">
+     <property name="text">
+      <string>-12.3456</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="4" column="1">
+     <property name="text">
+      <string>闭环</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="4" column="2">
+     <property name="text">
+      <string>静止</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+    <item row="4" column="3">
+     <property name="text">
+      <string>正常</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </item>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>100</y>
+     <width>221</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>单路电机控制</string>
+   </property>
+   <widget class="QPushButton" name="pushButton_single_motor_run">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>140</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>设置</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>20</y>
+      <width>151</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>电机名称</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox_single_motor_name">
+       <item>
+        <property name="text">
+         <string>盒体</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>轴1轴2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>轴3轴4</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>50</y>
+      <width>151</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>控制方式</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox_single_motor_ctrl">
+       <property name="currentIndex">
+        <number>3</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>闭环</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>开环</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>停车</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>运动</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>80</y>
+      <width>151</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>目标角度</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_single_motor_angel">
+       <property name="minimumSize">
+        <size>
+         <width>82</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="decimals">
+        <number>4</number>
+       </property>
+       <property name="minimum">
+        <double>-200.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>200.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>110</y>
+      <width>151</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>运动速度</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_single_motor_speed">
+       <property name="minimumSize">
+        <size>
+         <width>82</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="minimum">
+        <double>0.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>6.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>5.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_4">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>280</y>
+     <width>221</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>流程控制</string>
+   </property>
+   <widget class="QTextEdit" name="textEdit">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>201</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="html">
+     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;下一步序号：0 &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;轴1轴2目标角度0.0000 速度5.00 &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;轴3轴4目标角度0.0000 速度5.00 &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;盒体目标角度0.0000 速度5.00 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_flow_file">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>110</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>导入文件</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_flow_next">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>110</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>执行下一步</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>240</y>
+     <width>401</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>日志</string>
+   </property>
+   <widget class="QTextEdit" name="textEdit_log">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>381</width>
+      <height>121</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_log_clear">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>150</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>清除</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>lineEdit_portnum</tabstop>
+  <tabstop>pushButton_openport</tabstop>
+  <tabstop>comboBox_single_motor_name</tabstop>
+  <tabstop>comboBox_single_motor_ctrl</tabstop>
+  <tabstop>doubleSpinBox_single_motor_angel</tabstop>
+  <tabstop>doubleSpinBox_single_motor_speed</tabstop>
+  <tabstop>pushButton_single_motor_run</tabstop>
+  <tabstop>textEdit</tabstop>
+  <tabstop>pushButton_flow_file</tabstop>
+  <tabstop>pushButton_flow_next</tabstop>
+  <tabstop>tableWidget_stat</tabstop>
+  <tabstop>textEdit_log</tabstop>
+  <tabstop>pushButton_log_clear</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton_log_clear</sender>
+   <signal>clicked()</signal>
+   <receiver>Form</receiver>
+   <slot>click_log_clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>374</x>
+     <y>404</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>420</x>
+     <y>419</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_openport</sender>
+   <signal>clicked()</signal>
+   <receiver>Form</receiver>
+   <slot>click_pushButton_openport()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>597</x>
+     <y>52</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>645</x>
+     <y>16</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_closeport</sender>
+   <signal>clicked()</signal>
+   <receiver>Form</receiver>
+   <slot>click_pushButton_closeport()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>618</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>654</x>
+     <y>90</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_single_motor_run</sender>
+   <signal>clicked()</signal>
+   <receiver>Form</receiver>
+   <slot>click_pushButton_single_motor_run()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>605</x>
+     <y>253</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>660</x>
+     <y>250</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>click_log_clear()</slot>
+  <slot>click_pushButton_openport()</slot>
+  <slot>click_pushButton_closeport()</slot>
+  <slot>click_pushButton_single_motor_run()</slot>
+ </slots>
+</ui>
