@@ -1,8 +1,11 @@
 __author__ = 'WangYi'
 __version__ = 0.1
 
+# 串口接收 定时接收数据 仅取出1帧有效帧 然后解码并显示 其他帧丢弃 所有接收和处理在一个函数中完成
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QTabWidget, QTableWidgetItem
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QBrush, QColor
 from gui import Ui_Form
 
 import time
@@ -17,6 +20,12 @@ class Test(QWidget, Ui_Form):
         self.myserial = serial.Serial() 
         # 需要发送的21字节 第21字节为累加和
         self.data_send21 = np.zeros(21, dtype='uint8')
+
+        # 定时器 定时中断收取串口数据
+        self.timer_serial_rcv = QTimer()
+        self.timer_serial_rcv.stop()  # 可靠性设计 立即停止
+        self.timer_serial_rcv.setInterval(500)
+        self.timer_serial_rcv.timeout.connect(self.serial_recv)  # 绑定信号和槽         
         
 
 # ----------------响应和槽函数----------------
@@ -32,16 +41,18 @@ class Test(QWidget, Ui_Form):
         try:  # 打开串口         
             self.myserial.open()
             self.log_show('串口打开成功')
+            self.timer_serial_rcv.start()  # 启动接收定时器
             self.lineEdit_portnum.setEnabled(False)
             self.pushButton_closeport.setEnabled(True)
             self.pushButton_openport.setEnabled(False)
         except Exception as e:
             self.log_show('串口打开失败')
     
-    def click_pushButton_closeport(self):   # 关闭串口
-        try:  # 关闭串口  
+    def click_pushButton_closeport(self):   # 关闭串口        
+        try:  # 关闭串口              
             self.myserial.close() 
             self.log_show('串口关闭成功')
+            self.timer_serial_rcv.stop()  # 停止接收定时器
             self.lineEdit_portnum.setEnabled(True)
             self.pushButton_openport.setEnabled(True)
             self.pushButton_closeport.setEnabled(False)
@@ -110,6 +121,25 @@ class Test(QWidget, Ui_Form):
                     + motor_pos + ' 速度' + motor_speed + ' 设置完成')
         except Exception as e:
             self.log_show('串口发送失败')
+
+
+# ----------------自定义信号和槽函数----------------
+    def serial_recv(self): 
+        rcv_frame = list()       
+        if self.myserial.is_open and (self.myserial.inWaiting() > 0):
+            rcv = self.myserial.read(self.myserial.inWaiting())
+            for cnt, i in enumerate(rcv) :
+                if (i == 0xaa) and (rcv[cnt + 1] == 0xaa):                    
+                    _rcv_frame = rcv[cnt : cnt+23] 
+                    break            
+            # 接收完成后看看是否有整帧 如果有 转list类型 判累加和后解码显示            
+            if len(_rcv_frame) == 23:  #  帧头对 只有一个AA就可以判断
+                for j in _rcv_frame:  # byte类型转int
+                    # rcv_frame.append(int.from_bytes(j, byteorder='little'))
+                    rcv_frame.append(j)
+                if rcv_frame[-1] == self.serial_sum(rcv_frame):
+                    self.serial_frame_show(rcv_frame)  
+            
         
 
 # ----------------内部函数----------------
@@ -118,20 +148,72 @@ class Test(QWidget, Ui_Form):
         now = time.strftime('%Y-%m-%d %H:%M:%S ', time.localtime(time.time()))
         txt_out = now + foo_txt
         self.textEdit_log.append(txt_out)
+    
+    # 偏振盒各电机状态解码函数 被串口接收解析函数调用
+    def serial_frame_show(self, frame_dat):
+        axis_pos = [0, 0, 0, 0, 0] # 位置列表 依次代表轴1~4 最后一个元素为盒体
+        axis_loop_openclose = [0, 0, 0, 0, 0] # 开闭环中途
+        axis_run_stop = [0, 0, 0, 0, 0]  # 运动 静止
+        axis_ok_error = [0, 0, 0, 0, 0]  # 正常和报警
+
+        # 角度位置提取和更新
+        axis_pos[0] = self.byte2pos(frame_dat[2], frame_dat[3], frame_dat[4])
+        axis_pos[1] = self.byte2pos(frame_dat[6], frame_dat[7], frame_dat[8])
+        axis_pos[2] = self.byte2pos(frame_dat[10], frame_dat[11], frame_dat[12])
+        axis_pos[3] = self.byte2pos(frame_dat[14], frame_dat[15], frame_dat[16])
+        axis_pos[4] = self.byte2pos(frame_dat[18], frame_dat[19], frame_dat[20])
+
+        # 状态信息提取和更新
+        axis_loop_openclose[0], axis_run_stop[0], axis_ok_error[0] = self.stat_handle(frame_dat[5])
+        axis_loop_openclose[1], axis_run_stop[1], axis_ok_error[1] = self.stat_handle(frame_dat[9])
+        axis_loop_openclose[2], axis_run_stop[2], axis_ok_error[2] = self.stat_handle(frame_dat[13])
+        axis_loop_openclose[3], axis_run_stop[3], axis_ok_error[3] = self.stat_handle(frame_dat[17])
+        axis_loop_openclose[4], axis_run_stop[4], axis_ok_error[4] = self.stat_handle(frame_dat[21])
+        
+        # 内容显示
+        for i in range(5) :
+            self.tableWidget_stat.setItem(i, 0, self.table_item_set(str(axis_pos[i])))
+            self.tableWidget_stat.setItem(i, 1, self.table_item_set(axis_loop_openclose[i]))            
+            self.tableWidget_stat.setItem(i, 2, self.table_item_set(axis_run_stop[i]))
+            self.tableWidget_stat.setItem(i, 3, self.table_item_set(axis_ok_error[i]))            
+
+        pass
+
+
+    # tablewidget中每个方框内容设置  被状态解码函数serial_frame_show调用
+    def table_item_set(self, content):
+        item = QTableWidgetItem(content)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+
+        if content == '报警':
+            item.setBackground(QBrush(QColor(255, 0, 0)))
+        elif content == '运动' : 
+            item.setBackground(QBrush(QColor(0, 255, 0)))
+        else:
+            item.setBackground(QBrush(QColor(255, 255, 255)))        
+        
+        return item
 
     # 转台位置十进制转三个字节
     def pos2byte(self, pos):
         foo_pos = abs(round(pos * 10000)) # 求绝对值 乘1000后取整数
-        
-        low_byte = foo_pos & 0xff
-        mid_byte = (foo_pos >> 8 ) & 0xff
-        high_byte = (foo_pos >> 16 ) & 0xff
-
-        if pos < 0:  # 有负数 最高位补1
-            high_byte = 0x80 | high_byte
-        
-        return low_byte, mid_byte, high_byte
+        foo = foo_pos.to_bytes(length=3, byteorder='little')  # int类型转byte
+        if pos < 0: # 有负数 最高位补1
+            high_byte = foo[2] | 0x80
+        else:
+            high_byte = foo[2]
+        return foo[0], foo[1], high_byte
     
+    # 转台位置三字节转十进制  转台当前角度解析使用
+    def byte2pos(self, ll, mm, hh):
+        foo_h = hh & 0x7f # 最高位清零
+        foo_pos = [ll, mm, foo_h]
+        pos = int.from_bytes(foo_pos, byteorder='little')
+        if hh > 127 :
+            pos = -1 * pos
+        return (pos/10000)
+
+
     # 转台速度转换函数
     def speed2byte(self, sped):
         foo_speed = abs(round(sped * 100)) # 求绝对值 乘100后取整数
@@ -141,9 +223,32 @@ class Test(QWidget, Ui_Form):
 
         return low_byte, high_byte
 
+    # 转动运行状态处理函数 按bit拆分状态 状态显示线程调用
+    def stat_handle(self, stat):
+        foo = stat & 0xff  # 仅保留一个字节        
+        alarm = False
+        # 开环闭环判断
+        if (foo & 0x01) == 1:
+            openclose = '闭环'
+        else:
+            openclose = '开环'
+        # 运动静止判断
+        if (foo & 0x02) == 0x02:
+            run_stop =  '运动'
+        else:
+            run_stop = '静止'
+        # 正常报警判断
+        if (foo & 0x80) == 0x80:
+            ok_error =  '报警'
+            alarm = True
+        else:
+            ok_error = '正常'        
+        return openclose, run_stop, ok_error
+
+    #  求累加和函数
     def serial_sum(self, foo):
         sum = 0
-        for i in foo[2:-1]:
+        for i in foo[0:-1]:
             sum += i
         return (sum & 0xff)
 
