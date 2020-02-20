@@ -252,7 +252,7 @@ class Ui_Form(object):
         self.pushButton_closeport.setText(_translate("Form", "关闭"))
         self.pushButton_openport.setText(_translate("Form", "打开"))
         self.label_5.setText(_translate("Form", "串口号"))
-        self.lineEdit_portnum.setText(_translate("Form", "COM5"))
+        self.lineEdit_portnum.setText(_translate("Form", "COM1"))
         self.groupBox_2.setTitle(_translate("Form", "偏振盒状态"))
         item = self.tableWidget_stat.verticalHeaderItem(0)
         item.setText(_translate("Form", "轴1"))

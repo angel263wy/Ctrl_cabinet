@@ -132,22 +132,26 @@ class Test(QWidget, Ui_Form):
         while self.flow_queue.qsize() > 0:
             self.flow_queue.get()
 
-        filename = QFileDialog.getOpenFileName(self, filter='csv file(*.csv)', caption='打开流程文件')
-        if filename[0] :
+        try:
+            filename = QFileDialog.getOpenFileName(self, filter='csv file(*.csv)', caption='打开流程文件')
             flow_dat_df = pd.read_csv(filename[0], header=0)
-            # 处理csv文件并导入队列
-            flow_len = len(flow_dat_df.index)        
-            for i in range(flow_len):
-                pos = [0, 0.0, 0.0, 0.0] 
-                pos[0] = int(flow_dat_df.iloc[i,0])  # np类型转python类型
-                pos[1] = float(flow_dat_df.iloc[i,1])
-                pos[2] = float(flow_dat_df.iloc[i,2])
-                pos[3] = float(flow_dat_df.iloc[i,3])                       
-                self.flow_queue.put(self.flow2queue(pos[0], pos[1], pos[2], pos[3]))
-            
-            self.log_show('流程导入成功 共计' + str(flow_len) + '步')
-        else:
-            self.log_show('文件未打开')            
+            # 处理csv文件并导入队列 如果列数不为4 则报错
+            if 4 == len(flow_dat_df.columns):
+                flow_len = len(flow_dat_df.index)        
+                for i in range(flow_len):
+                    pos = [0, 0.0, 0.0, 0.0] 
+                    pos[0] = int(flow_dat_df.iloc[i,0])  # np类型转python类型
+                    pos[1] = float(flow_dat_df.iloc[i,1])
+                    pos[2] = float(flow_dat_df.iloc[i,2])
+                    pos[3] = float(flow_dat_df.iloc[i,3])                       
+                    self.flow_queue.put(self.flow2queue(pos[0], pos[1], pos[2], pos[3]))
+                
+                self.log_show('流程导入成功 共计' + str(flow_len) + '步')
+            else:
+                self.log_show('流程配置文件异常') 
+        except Exception as e:
+            self.log_show('流程文件未打开')         
+                       
 
         # 如果有流程 取出第一行并显示 '下一步'按钮使能
         if self.flow_queue.qsize() > 0 :
@@ -182,14 +186,10 @@ class Test(QWidget, Ui_Form):
                 self.textEdit_flow.append('盒体目标角度： ' + self.flow_next_step[-1])
             else:
                 self.pushButton_flow_next.setEnabled(False)
-                                        
+
         except Exception as e:
             self.log_show('串口发送失败')
-
-       
-
-        
-     
+  
 
 # ----------------自定义信号和槽函数----------------
     def serial_recv(self): 
@@ -207,8 +207,7 @@ class Test(QWidget, Ui_Form):
                     rcv_frame.append(j)
                 if rcv_frame[-1] == self.serial_sum(rcv_frame):
                     self.serial_frame_show(rcv_frame)  
-            
-        
+         
 
 # ----------------内部函数----------------
     # 记录日志函数
@@ -245,9 +244,7 @@ class Test(QWidget, Ui_Form):
             self.tableWidget_stat.setItem(i, 2, self.table_item_set(axis_run_stop[i]))
             self.tableWidget_stat.setItem(i, 3, self.table_item_set(axis_ok_error[i]))            
 
-        pass
-
-
+ 
     # tablewidget中每个方框内容设置  被状态解码函数serial_frame_show调用
     def table_item_set(self, content):
         item = QTableWidgetItem(content)
@@ -368,5 +365,3 @@ if __name__ == '__main__':
     mywidget = Test()
     mywidget.show()
     sys.exit(app.exec_())
-
-
