@@ -3,7 +3,7 @@ __version__ = 0.1
 
 # 串口接收 定时接收数据 仅取出1帧有效帧 然后解码并显示 其他帧丢弃 所有接收和处理在一个函数中完成
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QTabWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QWidget, QTabWidget, QTableWidgetItem, QFileDialog
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QBrush, QColor
 from gui import Ui_Form
@@ -11,6 +11,8 @@ from gui import Ui_Form
 import time
 import serial
 import numpy as np
+import pandas as pd
+import queue
 
 class Test(QWidget, Ui_Form):
     def __init__(self):
@@ -20,7 +22,9 @@ class Test(QWidget, Ui_Form):
         self.myserial = serial.Serial() 
         # 需要发送的21字节 第21字节为累加和
         self.data_send21 = np.zeros(21, dtype='uint8')
-
+        # 用于流程的队列 每一次put都将整帧放入 串口直接发送即可
+        self.flow_queue = queue.Queue()
+        self.flow_next_step = list()  # 保存下一个流程的角度 点击下一步按钮执行该列表内容
         # 定时器 定时中断收取串口数据
         self.timer_serial_rcv = QTimer()
         self.timer_serial_rcv.stop()  # 可靠性设计 立即停止
@@ -122,6 +126,70 @@ class Test(QWidget, Ui_Form):
         except Exception as e:
             self.log_show('串口发送失败')
 
+    # 打开流程文件
+    def click_pushButton_flow_file(self):
+        # 流程队列非空则清空
+        while self.flow_queue.qsize() > 0:
+            self.flow_queue.get()
+
+        filename = QFileDialog.getOpenFileName(self, filter='csv file(*.csv)', caption='打开流程文件')
+        if filename[0] :
+            flow_dat_df = pd.read_csv(filename[0], header=0)
+            # 处理csv文件并导入队列
+            flow_len = len(flow_dat_df.index)        
+            for i in range(flow_len):
+                pos = [0, 0.0, 0.0, 0.0] 
+                pos[0] = int(flow_dat_df.iloc[i,0])  # np类型转python类型
+                pos[1] = float(flow_dat_df.iloc[i,1])
+                pos[2] = float(flow_dat_df.iloc[i,2])
+                pos[3] = float(flow_dat_df.iloc[i,3])                       
+                self.flow_queue.put(self.flow2queue(pos[0], pos[1], pos[2], pos[3]))
+            
+            self.log_show('流程导入成功 共计' + str(flow_len) + '步')
+        else:
+            self.log_show('文件未打开')            
+
+        # 如果有流程 取出第一行并显示 '下一步'按钮使能
+        if self.flow_queue.qsize() > 0 :
+            self.flow_next_step = self.flow_queue.get()
+            self.textEdit_flow.clear()
+            self.textEdit_flow.append('下一步序号： ' + self.flow_next_step[-4])
+            self.textEdit_flow.append('轴1轴2目标角度： ' + self.flow_next_step[-3])
+            self.textEdit_flow.append('轴3轴4目标角度： ' + self.flow_next_step[-2])
+            self.textEdit_flow.append('盒体目标角度： ' + self.flow_next_step[-1])
+            self.pushButton_flow_next.setEnabled(True)           
+
+
+    # 运行下一步流程
+    def click_pushButton_flow_next(self):
+        # 将现存的字节发送出去
+        try:
+            self.myserial.write(self.flow_next_step[0:21])
+             # 取出数据用于显示
+            cnt = self.flow_next_step[-4]
+            pos12 = self.flow_next_step[-3]
+            pos34 = self.flow_next_step[-2]
+            posbox = self.flow_next_step[-1]
+            self.log_show('第' + cnt + '步执行完成 轴1轴2:' + pos12 + ' 轴3轴4:'
+                            + pos34 + ' 盒体:' + posbox)
+            # 发送完成后 如果后续还有内容 提取、暂存并显示 如果没有 '下一步'按钮禁用
+            if self.flow_queue.qsize() > 0 :
+                self.flow_next_step = self.flow_queue.get()
+                self.textEdit_flow.clear()
+                self.textEdit_flow.append('下一步序号： ' + self.flow_next_step[-4])
+                self.textEdit_flow.append('轴1轴2目标角度： ' + self.flow_next_step[-3])
+                self.textEdit_flow.append('轴3轴4目标角度： ' + self.flow_next_step[-2])
+                self.textEdit_flow.append('盒体目标角度： ' + self.flow_next_step[-1])
+            else:
+                self.pushButton_flow_next.setEnabled(False)
+                                        
+        except Exception as e:
+            self.log_show('串口发送失败')
+
+       
+
+        
+     
 
 # ----------------自定义信号和槽函数----------------
     def serial_recv(self): 
@@ -196,7 +264,7 @@ class Test(QWidget, Ui_Form):
 
     # 转台位置十进制转三个字节
     def pos2byte(self, pos):
-        foo_pos = abs(round(pos * 10000)) # 求绝对值 乘1000后取整数
+        foo_pos = abs(round(pos * 10000)) # 求绝对值 乘10000后取整数
         foo = foo_pos.to_bytes(length=3, byteorder='little')  # int类型转byte
         if pos < 0: # 有负数 最高位补1
             high_byte = foo[2] | 0x80
@@ -244,6 +312,49 @@ class Test(QWidget, Ui_Form):
         else:
             ok_error = '正常'        
         return openclose, run_stop, ok_error
+
+    
+    # 流程表转串口发送队列函数 将流程表文件三个角度转换成用于发送的字节
+    def flow2queue(self, cnt, pos12, pos34, pos_box):
+        data_queue = list()
+        foo_pos = [0, 0, 0]  # 暂存POS转BYTE的三字节
+        data_queue.append(0xaa)  # 帧头 
+        data_queue.append(0xaa)
+        # 轴1轴2
+        data_queue.append(0x81)  # 走位置
+        foo_pos[0], foo_pos[1], foo_pos[2] = self.pos2byte(pos12)  # 角度
+        data_queue.append(foo_pos[0]) 
+        data_queue.append(foo_pos[1])
+        data_queue.append(foo_pos[2])
+        data_queue.append(0xf4)  # 速度 5度/s
+        data_queue.append(0x01)
+        # 轴3轴4
+        data_queue.append(0x81)  # 走位置
+        foo_pos[0], foo_pos[1], foo_pos[2] = self.pos2byte(pos34)  # 角度
+        data_queue.append(foo_pos[0]) 
+        data_queue.append(foo_pos[1])
+        data_queue.append(foo_pos[2])
+        data_queue.append(0xf4)  # 速度 5度/s
+        data_queue.append(0x01)
+        # 盒体
+        data_queue.append(0x81)  # 走位置
+        foo_pos[0], foo_pos[1], foo_pos[2] = self.pos2byte(pos_box)  # 角度
+        data_queue.append(foo_pos[0]) 
+        data_queue.append(foo_pos[1])
+        data_queue.append(foo_pos[2])
+        data_queue.append(0xf4)  # 速度 5度/s
+        data_queue.append(0x01)
+        # 累加和
+        data_queue.append(0)
+        data_queue[20] = self.serial_sum(data_queue)
+        # 串口发送序列后 保存输入的角度值 用于显示
+        data_queue.append(str(cnt))
+        data_queue.append(str(pos12))
+        data_queue.append(str(pos34))
+        data_queue.append(str(pos_box))
+        
+        return data_queue
+
 
     #  求累加和函数
     def serial_sum(self, foo):

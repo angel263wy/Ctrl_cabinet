@@ -203,13 +203,14 @@ class Ui_Form(object):
         self.groupBox_4 = QtWidgets.QGroupBox(Form)
         self.groupBox_4.setGeometry(QtCore.QRect(480, 280, 221, 141))
         self.groupBox_4.setObjectName("groupBox_4")
-        self.textEdit = QtWidgets.QTextEdit(self.groupBox_4)
-        self.textEdit.setGeometry(QtCore.QRect(10, 30, 201, 71))
-        self.textEdit.setObjectName("textEdit")
+        self.textEdit_flow = QtWidgets.QTextEdit(self.groupBox_4)
+        self.textEdit_flow.setGeometry(QtCore.QRect(10, 30, 201, 71))
+        self.textEdit_flow.setObjectName("textEdit_flow")
         self.pushButton_flow_file = QtWidgets.QPushButton(self.groupBox_4)
         self.pushButton_flow_file.setGeometry(QtCore.QRect(30, 110, 75, 23))
         self.pushButton_flow_file.setObjectName("pushButton_flow_file")
         self.pushButton_flow_next = QtWidgets.QPushButton(self.groupBox_4)
+        self.pushButton_flow_next.setEnabled(False)
         self.pushButton_flow_next.setGeometry(QtCore.QRect(140, 110, 75, 23))
         self.pushButton_flow_next.setObjectName("pushButton_flow_next")
         self.groupBox_5 = QtWidgets.QGroupBox(Form)
@@ -228,6 +229,8 @@ class Ui_Form(object):
         self.pushButton_openport.clicked.connect(Form.click_pushButton_openport)
         self.pushButton_closeport.clicked.connect(Form.click_pushButton_closeport)
         self.pushButton_single_motor_run.clicked.connect(Form.click_pushButton_single_motor_run)
+        self.pushButton_flow_file.clicked.connect(Form.click_pushButton_flow_file)
+        self.pushButton_flow_next.clicked.connect(Form.click_pushButton_flow_next)
         QtCore.QMetaObject.connectSlotsByName(Form)
         Form.setTabOrder(self.lineEdit_portnum, self.pushButton_openport)
         Form.setTabOrder(self.pushButton_openport, self.comboBox_single_motor_name)
@@ -235,8 +238,8 @@ class Ui_Form(object):
         Form.setTabOrder(self.comboBox_single_motor_ctrl, self.doubleSpinBox_single_motor_angel)
         Form.setTabOrder(self.doubleSpinBox_single_motor_angel, self.doubleSpinBox_single_motor_speed)
         Form.setTabOrder(self.doubleSpinBox_single_motor_speed, self.pushButton_single_motor_run)
-        Form.setTabOrder(self.pushButton_single_motor_run, self.textEdit)
-        Form.setTabOrder(self.textEdit, self.pushButton_flow_file)
+        Form.setTabOrder(self.pushButton_single_motor_run, self.textEdit_flow)
+        Form.setTabOrder(self.textEdit_flow, self.pushButton_flow_file)
         Form.setTabOrder(self.pushButton_flow_file, self.pushButton_flow_next)
         Form.setTabOrder(self.pushButton_flow_next, self.tableWidget_stat)
         Form.setTabOrder(self.tableWidget_stat, self.textEdit_log)
@@ -286,14 +289,14 @@ class Ui_Form(object):
         self.label_3.setText(_translate("Form", "目标角度"))
         self.label_4.setText(_translate("Form", "运动速度"))
         self.groupBox_4.setTitle(_translate("Form", "流程控制"))
-        self.textEdit.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.textEdit_flow.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">下一步序号：0 </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">轴1轴2目标角度0.0000 速度5.00 </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">轴3轴4目标角度0.0000 速度5.00 </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">盒体目标角度0.0000 速度5.00 </p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">轴1轴2目标角度 0.0000 </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">轴3轴4目标角度 0.0000 </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">盒体目标角度 0.0000</p></body></html>"))
         self.pushButton_flow_file.setText(_translate("Form", "导入文件"))
         self.pushButton_flow_next.setText(_translate("Form", "执行下一步"))
         self.groupBox_5.setTitle(_translate("Form", "日志"))
